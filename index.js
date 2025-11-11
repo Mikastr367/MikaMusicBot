@@ -101,3 +101,4 @@ if (!token || typeof token !== 'string') {
 
 // Bot starten
 client.login(token);
+const token = process.env.DISCORD_TOKEN;
