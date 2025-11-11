@@ -1,26 +1,41 @@
+const { REST, Routes } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v10');
 
 const commands = [];
 const commandsPath = path.join(__dirname, 'commands');
-for (const file of fs.readdirSync(commandsPath).filter(f => f.endsWith('.js'))) {
-  const cmd = require(path.join(commandsPath, file));
-  if (cmd.data) commands.push(cmd.data.toJSON());
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+  const command = require(path.join(commandsPath, file));
+  commands.push(command.data.toJSON());
 }
 
-const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+// Token und Client ID aus Umgebungsvariablen
+const token = process.env.DISCORD_TOKEN;
+const clientId = process.env.CLIENT_ID; // Dein Bot Client ID
+const guildId = process.env.GUILD_ID;   // Optional: für Testserver, schneller
+
+const rest = new REST({ version: '10' }).setToken(token);
 
 (async () => {
   try {
-    console.log('Deploying commands...');
+    console.log(`🚀 Registriere ${commands.length} Commands...`);
+
+    // Auf Guild Ebene (schneller zum testen)
     await rest.put(
-      Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+      Routes.applicationGuildCommands(clientId, guildId),
       { body: commands }
     );
-    console.log('✅ Commands registered to guild', process.env.GUILD_ID);
-  } catch (err) {
-    console.error(err);
+
+    // Oder global (dauert bis zu 1h bis es überall sichtbar ist)
+    // await rest.put(
+    //   Routes.applicationCommands(clientId),
+    //   { body: commands }
+    // );
+
+    console.log('✅ Commands erfolgreich registriert.');
+  } catch (error) {
+    console.error(error);
   }
 })();
