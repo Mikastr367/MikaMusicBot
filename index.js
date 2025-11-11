@@ -66,11 +66,10 @@ client.on('interactionCreate', async interaction => {
     }
   }
 
-  // Buttons (RPS, pizzalandunban etc.)
+  // Buttons (z.B. Rock Paper Scissors)
   if (interaction.isButton()) {
     const id = interaction.customId;
     
-    // Rock Paper Scissors
     if (id.startsWith('rps_')) {
       const choice = id.split('_')[1];
       const options = ['rock','paper','scissors'];
@@ -82,8 +81,6 @@ client.on('interactionCreate', async interaction => {
       else resultText += "Du verlierst!";
       await interaction.update({ content: resultText, components: [] });
     }
-
-    // Hier kannst du weitere Button-Interaktionen hinzufügen
   }
 });
 
@@ -95,7 +92,12 @@ client.once('ready', async () => {
   }
 });
 
+// Token aus Umgebungsvariable einlesen
+const token = process.env.DISCORD_TOKEN;
+if (!token || typeof token !== 'string') {
+  console.error('⚠️ Fehler: Bot-Token fehlt oder ist ungültig! Bitte Umgebungsvariable DISCORD_TOKEN setzen.');
+  process.exit(1);
+}
+
 // Bot starten
-client.login(process.env.TOKEN);
-
-
+client.login(token);
