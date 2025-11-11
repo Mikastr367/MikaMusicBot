@@ -1,3 +1,11 @@
+client.on('ready', () => {
+  console.log(`✅ Bot online: ${client.user.tag}`);
+});
+
+client.on('interactionCreate', interaction => {
+  console.log('Neue Interaction:', interaction.commandName || interaction.customId);
+});
+
 const fs = require('fs');
 const path = require('path');
 const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
