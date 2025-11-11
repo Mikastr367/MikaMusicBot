@@ -4,7 +4,9 @@ const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js'
 const { DisTube } = require('distube');
 const playdl = require('play-dl');
 
-// Client initialisieren
+// ========================
+// Client Initialisierung
+// ========================
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -15,19 +17,33 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
+// ========================
+// Globale Error-Handler
+// ========================
+process.on('unhandledRejection', error => {
+  console.error('Unhandled promise rejection:', error);
+});
+
+client.on('error', error => {
+  console.error('Discord client error:', error);
+});
+
+// ========================
 // Commands einlesen
+// ========================
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
 if (fs.existsSync(commandsPath)) {
   const commandFiles = fs.readdirSync(commandsPath).filter(f => f.endsWith('.js'));
   for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
+    const command = require(path.join(commandsPath, file));
     client.commands.set(command.data.name, command);
   }
 }
 
-// DisTube instance
+// ========================
+// DisTube initialisieren
+// ========================
 client.distube = new DisTube(client, {
   leaveOnStop: false,
   emitNewSongOnly: true,
@@ -36,23 +52,21 @@ client.distube = new DisTube(client, {
   emitAddListWhenCreatingQueue: false
 });
 
+// ========================
 // DisTube Events
+// ========================
 client.distube
-  .on('playSong', (queue, song) => {
-    queue.textChannel?.send(`▶️ Jetzt spielt: **${song.name}**`);
-  })
-  .on('addSong', (queue, song) => {
-    queue.textChannel?.send(`➕ Zur Queue hinzugefügt: **${song.name}**`);
-  })
-  .on('finish', queue => {
-    queue.textChannel?.send('✅ Queue fertig.');
-  })
+  .on('playSong', (queue, song) => queue.textChannel?.send(`▶️ Jetzt spielt: **${song.name}**`))
+  .on('addSong', (queue, song) => queue.textChannel?.send(`➕ Zur Queue hinzugefügt: **${song.name}**`))
+  .on('finish', queue => queue.textChannel?.send('✅ Queue fertig.'))
   .on('error', (channel, e) => {
-    console.error(e);
+    console.error('DisTube Error:', e);
     channel?.send('Fehler mit DisTube: ' + String(e));
   });
 
+// ========================
 // Interactions
+// ========================
 client.on('interactionCreate', async interaction => {
   // Slash Commands
   if (interaction.isChatInputCommand()) {
@@ -61,7 +75,7 @@ client.on('interactionCreate', async interaction => {
     try {
       await cmd.execute(interaction, client);
     } catch (err) {
-      console.error(err);
+      console.error('Command Error:', err);
       await interaction.reply({ content: 'Fehler beim Ausführen des Commands', ephemeral: true });
     }
   }
@@ -69,10 +83,9 @@ client.on('interactionCreate', async interaction => {
   // Buttons (z.B. Rock Paper Scissors)
   if (interaction.isButton()) {
     const id = interaction.customId;
-    
     if (id.startsWith('rps_')) {
       const choice = id.split('_')[1];
-      const options = ['rock','paper','scissors'];
+      const options = ['rock', 'paper', 'scissors'];
       const botChoice = options[Math.floor(Math.random() * 3)];
       const win = (c, b) => (c === 'rock' && b === 'scissors') || (c === 'scissors' && b === 'paper') || (c === 'paper' && b === 'rock');
       let resultText = `Du: **${choice}** — Bot: **${botChoice}**\n`;
@@ -84,21 +97,32 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
+// ========================
 // Ready Event
+// ========================
 client.once('ready', async () => {
   console.log('✅ Bot ready:', client.user.tag);
-  if (await playdl.is_expired()) {
-    await playdl.refreshToken();
+
+  // play-dl Token prüfen
+  try {
+    if (await playdl.is_expired()) {
+      await playdl.refreshToken();
+      console.log('play-dl Token erfolgreich aktualisiert');
+    }
+  } catch (err) {
+    console.error('Fehler beim Überprüfen von play-dl Token:', err);
   }
 });
 
-// Token aus Umgebungsvariable einlesen
+// ========================
+// Token prüfen & Bot starten
+// ========================
 const token = process.env.DISCORD_TOKEN;
 if (!token || typeof token !== 'string') {
   console.error('⚠️ Fehler: Bot-Token fehlt oder ist ungültig! Bitte Umgebungsvariable DISCORD_TOKEN setzen.');
   process.exit(1);
 }
 
-// Bot starten
 client.login(token);
+
 
