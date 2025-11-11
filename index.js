@@ -4,6 +4,7 @@ const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js'
 const { DisTube } = require('distube');
 const playdl = require('play-dl');
 
+// Client initialisieren
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -14,13 +15,16 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
+// Commands einlesen
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(f => f.endsWith('.js'));
-for (const file of commandFiles) {
-  const filePath = path.join(commandsPath, file);
-  const command = require(filePath);
-  client.commands.set(command.data.name, command);
+if (fs.existsSync(commandsPath)) {
+  const commandFiles = fs.readdirSync(commandsPath).filter(f => f.endsWith('.js'));
+  for (const file of commandFiles) {
+    const filePath = path.join(commandsPath, file);
+    const command = require(filePath);
+    client.commands.set(command.data.name, command);
+  }
 }
 
 // DisTube instance
@@ -32,7 +36,7 @@ client.distube = new DisTube(client, {
   emitAddListWhenCreatingQueue: false
 });
 
-// simple Distube event logging
+// DisTube Events
 client.distube
   .on('playSong', (queue, song) => {
     queue.textChannel?.send(`▶️ Jetzt spielt: **${song.name}**`);
@@ -48,8 +52,9 @@ client.distube
     channel?.send('Fehler mit DisTube: ' + String(e));
   });
 
-// Interaction handling
+// Interactions
 client.on('interactionCreate', async interaction => {
+  // Slash Commands
   if (interaction.isChatInputCommand()) {
     const cmd = client.commands.get(interaction.commandName);
     if (!cmd) return interaction.reply({ content: 'Command nicht gefunden', ephemeral: true });
@@ -61,14 +66,15 @@ client.on('interactionCreate', async interaction => {
     }
   }
 
-  // Button interactions for RPS and pizzalandunban etc.
+  // Buttons (RPS, pizzalandunban etc.)
   if (interaction.isButton()) {
-    // RPS buttons format: rps_rock, rps_paper, rps_scissors
     const id = interaction.customId;
-    if (id && id.startsWith('rps_')) {
+    
+    // Rock Paper Scissors
+    if (id.startsWith('rps_')) {
       const choice = id.split('_')[1];
       const options = ['rock','paper','scissors'];
-      const botChoice = options[Math.floor(Math.random()*3)];
+      const botChoice = options[Math.floor(Math.random() * 3)];
       const win = (c, b) => (c === 'rock' && b === 'scissors') || (c === 'scissors' && b === 'paper') || (c === 'paper' && b === 'rock');
       let resultText = `Du: **${choice}** — Bot: **${botChoice}**\n`;
       if (choice === botChoice) resultText += "Unentschieden!";
@@ -76,17 +82,19 @@ client.on('interactionCreate', async interaction => {
       else resultText += "Du verlierst!";
       await interaction.update({ content: resultText, components: [] });
     }
+
+    // Hier kannst du weitere Button-Interaktionen hinzufügen
   }
 });
 
+// Ready Event
 client.once('ready', async () => {
   console.log('✅ Bot ready:', client.user.tag);
-  // ensure play-dl is ready for YouTube
   if (await playdl.is_expired()) {
-    await playdl.refreshToken(); // best effort
+    await playdl.refreshToken();
   }
 });
 
-client.login("MTQzNzUyNjA2NzMyNDkxMTc3Mg.Gm2G7h.gT28jOEstozVrCvxb9Ixx2QF5TeE6Q6uHNVj6U");
-
+// Bot starten
+client.login(process.env.TOKEN);
 
