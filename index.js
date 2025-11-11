@@ -86,5 +86,7 @@ client.once('ready', async () => {
     await playdl.refreshToken(); // best effort
   }
 });
-client.login(process.env.TOKEN);
+
+client.login("MTQzNzUyNjA2NzMyNDkxMTc3Mg.Gm2G7h.gT28jOEstozVrCvxb9Ixx2QF5TeE6Q6uHNVj6U");
+
 
