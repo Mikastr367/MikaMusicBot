@@ -1,15 +1,12 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 module.exports = {
-  data: new SlashCommandBuilder().setName('rps').setDescription('Rock Paper Scissors gegen den Bot'),
+  data: new SlashCommandBuilder().setName('rps').setDescription('Spiele Stein Schere Papier'),
   async execute(interaction) {
-    const row = new ActionRowBuilder()
-      .addComponents(
-        new ButtonBuilder().setCustomId('rps_rock').setLabel('✊ Rock').setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId('rps_paper').setLabel('✋ Paper').setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId('rps_scissors').setLabel('✌️ Scissors').setStyle(ButtonStyle.Primary)
-      );
-    await interaction.reply({ content: 'Wähle: Rock, Paper oder Scissors', components: [row] });
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId('rps_rock').setLabel('Stein').setStyle(ButtonStyle.Primary),
+      new ButtonBuilder().setCustomId('rps_paper').setLabel('Papier').setStyle(ButtonStyle.Primary),
+      new ButtonBuilder().setCustomId('rps_scissors').setLabel('Schere').setStyle(ButtonStyle.Primary)
+    );
+    await interaction.reply({ content: 'Wähle deine Option', components: [row] });
   }
 };
