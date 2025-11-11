@@ -1,16 +1,17 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('@discordjs/builders');
-const { ActionRow, ButtonComponent } = require('discord.js');
-
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 module.exports = {
-  data: new SlashCommandBuilder().setName('pizzalandunban').setDescription('Zeigt das Unban-Angebot (300 €).'),
+  data: new SlashCommandBuilder().setName('pizzalandunban').setDescription('Zeigt das Unban Angebot'),
   async execute(interaction) {
-    const row = new (require('discord.js').ActionRowBuilder)()
-      .addComponents(
-        new (require('discord.js').ButtonBuilder)()
-          .setLabel('Unban für 300 € kaufen')
-          .setStyle(require('discord.js').ButtonStyle.Link)
-          .setURL('https://softof.de/')
-      );
-    await interaction.reply({ content: 'Kaufe dir ein Unban (300 €). Klicke auf den Button, um zur Seite zu gehen.', components: [row] });
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setLabel('Unbann kaufen 300 EUR')
+        .setStyle(ButtonStyle.Link)
+        .setURL('https://softof.de/')
+    );
+    await interaction.reply({
+      content: 'Unbann Angebot: Klicke auf den Button um zum Kauf weitergeleitet zu werden. Hinweis: handle stets sicher und vertraue nur legitimen Anbietern.',
+      components: [row],
+      ephemeral: false
+    });
   }
 };
