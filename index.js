@@ -96,5 +96,5 @@ client.once('ready', async () => {
 });
 
 // Bot starten
-client.login(process.env.TOKEN);
+client.login("MTQzNzUyNjA2NzMyNDkxMTc3Mg.GAhgT4.f0q810pXDwUcZh3-8rOGAcp6Ps-2cw1cS_yTG4");
 
