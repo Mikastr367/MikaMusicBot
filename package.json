@@ -1,0 +1,19 @@
+{
+  "name": "mikamusicbot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "deploy-commands": "node deploy-commands.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.0",
+    "distube": "^4.0.3",
+    "play-dl": "^1.9.7",
+    "@discordjs/rest": "^1.6.0",
+    "node-fetch": "^2.6.12"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
