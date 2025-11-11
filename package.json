@@ -1,13 +1,14 @@
 {
-  "name": "mikamusicbot",
+  "name": "mikamusikbot",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "deploy-commands": "node deploy-commands.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "discord.js": "^14.13.0",
+    "distube": "^4.0.0",
+    "play-dl": "^1.10.0",
     "dotenv": "^16.0.0"
   }
 }
